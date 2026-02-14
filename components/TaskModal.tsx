@@ -1,59 +1,75 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { CloseOutlined } from '@ant-design/icons';
 
-interface CreateTaskModalProps {
+interface TaskModalProps {
     isOpen: boolean;
     onClose: () => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSave: (task: any) => void;
     currentUser: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initialData?: any; // If provided, we are in Edit mode
 }
 
-export default function CreateTaskModal({ isOpen, onClose, onSave, currentUser }: CreateTaskModalProps) {
+export default function TaskModal({ isOpen, onClose, onSave, currentUser, initialData }: TaskModalProps) {
+    const [mounted, setMounted] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('pending');
     const [dueDate, setDueDate] = useState('');
     const [owner, setOwner] = useState(currentUser);
 
-    // Reset fields when modal opens/closes or currentUser changes
-    React.useEffect(() => {
-        if (isOpen) {
-            setOwner(currentUser);
-            setStatus('pending');
-        }
-    }, [isOpen, currentUser]);
+    const isEditMode = !!initialData;
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Reset fields when modal opens/closes or initialData changes
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                setTitle(initialData.title);
+                setDescription(initialData.description);
+                setStatus(initialData.status);
+                setDueDate(initialData.dueDate);
+                setOwner(initialData.owner);
+            } else {
+                // Reset for Create mode
+                setTitle('');
+                setDescription('');
+                setStatus('pending');
+                setDueDate('');
+                setOwner(currentUser);
+            }
+        }
+    }, [isOpen, initialData, currentUser]);
+
+    if (!isOpen || !mounted) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const newTask = {
-            id: Date.now(),
+        const taskData = {
+            id: initialData ? initialData.id : Date.now(),
             title,
             description,
             status,
             dueDate,
             owner,
-            createdAt: new Date().toISOString()
+            createdAt: initialData ? initialData.createdAt : new Date().toISOString()
         };
-        onSave(newTask);
+        onSave(taskData);
         onClose();
-        // Reset form
-        setTitle('');
-        setDescription('');
-        setStatus('pending');
-        setDueDate('');
-        setOwner('');
     };
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in-up">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-[#f8fff8]">
-                    <h2 className="text-xl font-bold text-gray-800">Create New Task</h2>
+                    <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Task' : 'Create New Task'}</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <CloseOutlined className="text-lg" />
                     </button>
@@ -75,12 +91,23 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, currentUser }
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
-                            <input
-                                type="text"
-                                value="Pending"
-                                disabled
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed focus:outline-none"
-                            />
+                            {isEditMode ? (
+                                <select
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] bg-white"
+                                >
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            ) : (
+                                <input
+                                    type="text"
+                                    value="Pending"
+                                    disabled
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed focus:outline-none"
+                                />
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Owner</label>
@@ -127,11 +154,12 @@ export default function CreateTaskModal({ isOpen, onClose, onSave, currentUser }
                             type="submit"
                             className="flex-1 px-4 py-2.5 bg-[#5EA500] text-white font-medium rounded-lg hover:bg-[#4a8000] transition-colors shadow-md shadow-[#5EA500]/20"
                         >
-                            Create Task
+                            {isEditMode ? 'Save Changes' : 'Create Task'}
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

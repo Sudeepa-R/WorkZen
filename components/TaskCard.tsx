@@ -2,21 +2,29 @@ import React from 'react';
 import { CalendarOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
 interface TaskCardProps {
+    id: number;
     title: string;
     description: string;
     status: 'pending' | 'completed';
     dueDate: string;
     owner: string;
     createdAt: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onEdit: (task: any) => void;
+    onDelete: (id: number) => void;
 }
 
-export default function TaskCard({ title, description, status = 'pending', dueDate, owner, createdAt }: TaskCardProps) {
+export default function TaskCard({ id, title, description, status = 'pending', dueDate, owner, createdAt, onEdit, onDelete }: TaskCardProps) {
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
         return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     };
 
     const displayStatus = status || 'pending';
+
+    const handleEditClick = () => {
+        onEdit({ id, title, description, status, dueDate, owner, createdAt });
+    };
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow flex flex-col h-full">
@@ -48,10 +56,16 @@ export default function TaskCard({ title, description, status = 'pending', dueDa
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                    <button className="flex-1 py-1.5 bg-[#5EA500] text-white text-xs font-medium rounded-md hover:bg-[#4a8000] transition-colors">
+                    <button
+                        onClick={handleEditClick}
+                        className="flex-1 py-1.5 bg-[#5EA500] text-white text-xs font-medium rounded-md hover:bg-[#4a8000] transition-colors"
+                    >
                         Edit
                     </button>
-                    <button className="flex-1 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors">
+                    <button
+                        onClick={() => onDelete(id)}
+                        className="flex-1 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors"
+                    >
                         Delete
                     </button>
                 </div>

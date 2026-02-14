@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import TaskCard from '@/components/TaskCard';
-import CreateTaskModal from '@/components/CreateTaskModal';
+import TaskModal from '@/components/TaskModal'; // Updated import
 import { PlusOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'next/navigation';
 
@@ -12,6 +12,9 @@ function DashboardContent() {
     const dateFilter = searchParams.get('dueDate');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [editingTask, setEditingTask] = useState<any>(null); // State for the task being edited
+
     const [tasks, setTasks] = useState([
         {
             id: 1,
@@ -43,8 +46,32 @@ function DashboardContent() {
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleSaveTask = (newTask: any) => {
-        setTasks([newTask, ...tasks]);
+    const handleSaveTask = (taskData: any) => {
+        if (editingTask) {
+            // Update existing task
+            setTasks(tasks.map(t => t.id === taskData.id ? taskData : t));
+        } else {
+            // Create new task
+            setTasks([taskData, ...tasks]);
+        }
+        setEditingTask(null); // Reset edit state
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleEditTask = (task: any) => {
+        setEditingTask(task);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteTask = (id: number) => {
+        if (window.confirm('Are you sure you want to delete this task?')) {
+            setTasks(tasks.filter(t => t.id !== id));
+        }
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingTask(null);
     };
 
     const filteredTasks = tasks.filter(task => {
@@ -53,23 +80,25 @@ function DashboardContent() {
             return false;
         }
 
-        // Date Filter (Simplified logic for demo)
+        // Date Filter
         if (dateFilter && dateFilter !== 'all') {
             const taskDate = new Date(task.dueDate);
             const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+            const taskDateOnly = new Date(taskDate);
+            taskDateOnly.setHours(0, 0, 0, 0);
 
             if (dateFilter === 'today') {
-                return taskDate.toDateString() === today.toDateString();
+                return taskDateOnly.getTime() === today.getTime();
             }
             if (dateFilter === 'overdue') {
-                return taskDate < today && task.status !== 'completed';
+                return taskDateOnly < today && task.status !== 'completed';
             }
             if (dateFilter === 'week') {
-                const nextWeek = new Date();
+                const nextWeek = new Date(today);
                 nextWeek.setDate(today.getDate() + 7);
-                return taskDate >= today && taskDate <= nextWeek;
+                return taskDateOnly >= today && taskDateOnly <= nextWeek;
             }
-            // 'week' logic omitted for brevity in this step, but can be added
         }
 
         return true;
@@ -80,7 +109,10 @@ function DashboardContent() {
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">Task List</h1>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                        setEditingTask(null);
+                        setIsModalOpen(true);
+                    }}
                     className="flex items-center gap-2 px-4 py-2 bg-[#5EA500] text-white text-sm font-medium rounded-lg hover:bg-[#4a8000] transition-colors shadow-sm"
                 >
                     <PlusOutlined />
@@ -91,8 +123,13 @@ function DashboardContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredTasks.length > 0 ? (
                     filteredTasks.map(task => (
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        <TaskCard key={task.id} {...task as any} />
+                        <TaskCard
+                            key={task.id}
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            {...task as any}
+                            onEdit={handleEditTask}
+                            onDelete={handleDeleteTask}
+                        />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-10 text-gray-500">
@@ -101,11 +138,12 @@ function DashboardContent() {
                 )}
             </div>
 
-            <CreateTaskModal
+            <TaskModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={handleCloseModal}
                 onSave={handleSaveTask}
                 currentUser="John Doe"
+                initialData={editingTask}
             />
         </div>
     );
