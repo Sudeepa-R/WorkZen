@@ -1,38 +1,69 @@
+"use client";
+
 import React from 'react';
 import { FilterOutlined, DownOutlined } from '@ant-design/icons';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Sidebar() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const handleFilterChange = (key: string, value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (value && value !== 'all') {
+            params.set(key, value);
+        } else {
+            params.delete(key);
+        }
+        router.push(`/dashboard?${params.toString()}`);
+    };
+
     return (
-        <aside className="w-64 bg-[#f0f9f0] border-r border-[#e0f2e0] h-full p-6 hidden lg:block">
-            <div className="flex items-center gap-2 mb-8">
-                <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
+        <aside className="w-72 bg-[#f8fff8] border-r border-[#e6f4e6] h-full p-8 hidden lg:block shadow-[inset_-1px_0_0_rgba(0,0,0,0.02)]">
+            <div className="flex items-center gap-2 mb-10">
+                <FilterOutlined className="text-[#5EA500] text-lg" />
+                <h2 className="text-xl font-bold text-gray-800 tracking-tight">Filters</h2>
             </div>
 
-            <div className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category:</label>
+            <div className="space-y-8">
+                <div className="group">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider text-xs">Status</label>
                     <div className="relative">
-                        <select className="w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2 px-3 rounded-lg focus:outline-none focus:border-lime-500 cursor-pointer">
-                            <option>All</option>
-                            <option>Work</option>
-                            <option>Personal</option>
-                            <option>Urgent</option>
+                        <select
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
+                            value={searchParams.get('status') || 'all'}
+                            className="w-full appearance-none bg-white border border-[#e6f4e6] text-gray-700 py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:border-[#5EA500] focus:ring-2 focus:ring-[#5EA500]/20 transition-all cursor-pointer hover:border-[#5EA500]/50"
+                        >
+                            <option value="all">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
                         </select>
-                        <DownOutlined className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none" />
+                        <DownOutlined className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5EA500] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority:</label>
+                <div className="group">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider text-xs">Due Date</label>
                     <div className="relative">
-                        <select className="w-full appearance-none bg-white border border-gray-200 text-gray-700 py-2 px-3 rounded-lg focus:outline-none focus:border-lime-500 cursor-pointer">
-                            <option>All</option>
-                            <option>High</option>
-                            <option>Medium</option>
-                            <option>Low</option>
+                        <select
+                            onChange={(e) => handleFilterChange('dueDate', e.target.value)}
+                            value={searchParams.get('dueDate') || 'all'}
+                            className="w-full appearance-none bg-white border border-[#e6f4e6] text-gray-700 py-3 px-4 rounded-xl shadow-sm focus:outline-none focus:border-[#5EA500] focus:ring-2 focus:ring-[#5EA500]/20 transition-all cursor-pointer hover:border-[#5EA500]/50"
+                        >
+                            <option value="all">Any Date</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="overdue">Overdue</option>
                         </select>
-                        <DownOutlined className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none" />
+                        <DownOutlined className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#5EA500] pointer-events-none transition-transform group-hover:translate-y-[-40%]" />
                     </div>
+                </div>
+            </div>
+
+            {/* Optional: Add a decorative element or bottom section if needed */}
+            <div className="mt-auto pt-10 border-t border-[#e6f4e6]/50 mt-10">
+                <div className="p-4 bg-white/50 rounded-xl border border-[#e6f4e6]">
+                    <p className="text-xs text-[#4a8000] font-medium text-center">Pro Tip: Use filters to focus on what matters.</p>
                 </div>
             </div>
         </aside>
