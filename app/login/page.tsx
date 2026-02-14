@@ -1,172 +1,176 @@
 "use client"
 import React, { useState } from 'react'
-import Link from 'next/link'
+import {
+    UserOutlined,
+    LockOutlined,
+    MailOutlined,
+    ArrowRightOutlined
+} from '@ant-design/icons'
 
-function Page() {
+import { useRouter } from 'next/navigation';
+
+export default function Page() {
+    const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    // Dummy credentials pre-filled
+    const [email, setEmail] = useState('demo@workzen.com');
+    const [password, setPassword] = useState('password123');
     const [username, setUsername] = useState('');
-    const [touched, setTouched] = useState({ email: false, password: false, username: false });
-    const [signupError, setSignupError] = useState('');
-
-    // Validation logic
-    const isEmailInvalid = touched.email && (!email || !email.includes('@'));
-    const isPasswordInvalid = touched.password && !password;
-    const isUsernameInvalid = !isLogin && touched.username && !username;
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        setTouched({ email: true, password: true, username: !isLogin });
-
-        // Mock error for signup to match the image
-        if (!isLogin && email === 'existing@example.com') {
-            setSignupError('Error: This email is already associated with an existing account.');
-            return;
-        }
-
-        if (email && password && email.includes('@') && (isLogin || username)) {
-            console.log(isLogin ? 'Login submitted' : 'Signup submitted', { email, password, username });
-            setSignupError('');
-        }
-    };
+    const [focusedField, setFocusedField] = useState<string | null>(null);
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
-        // Reset states
-        setEmail('');
-        setPassword('');
+        // Clear errors/states if needed, or keep dummy data for convenience
+        if (!isLogin) {
+            // Switching to Login, maybe restore dummy?
+            setEmail('demo@workzen.com');
+            setPassword('password123');
+        } else {
+            // Switching to Signup
+            setEmail('');
+            setPassword('');
+        }
         setUsername('');
-        setTouched({ email: false, password: false, username: false });
-        setSignupError('');
     }
 
+    // Redirect to dashboard on login submission
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log("Submitted", { isLogin, email, password, username });
+        if (isLogin) {
+            router.push('/dashboard');
+        }
+    };
+
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-white">
-            <div className="w-full max-w-[400px] p-6 bg-white rounded-lg border-1 border-gray-200 shadow-lg ">
-                <h1 className="text-2xl font-light text-black mb-8 text-center">
-                    {isLogin ? 'Login to TaskManager' : 'Create Your Account'}
-                </h1>
+        <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 relative overflow-hidden font-sans">
+            {/* Subtle Green Background Blobs - Simplified */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-lime-200/40 blur-[80px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-emerald-100/60 blur-[60px]" />
+            </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Username Field - Only for Signup */}
-                    {!isLogin && (
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="username"
-                                className="block text-sm text-gray-800"
-                            >
-                                Username
-                            </label>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                onBlur={() => setTouched(prev => ({ ...prev, username: true }))}
-                                placeholder="Enter your username"
-                                className={`w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors placeholder:text-gray-400
-                                    ${isUsernameInvalid
-                                        ? 'border-red-500 focus:border-red-500'
-                                        : 'border-gray-200 focus:border-gray-400'
-                                    }
-                                `}
-                            />
-                            {isUsernameInvalid && (
-                                <p className="text-xs text-red-500">
-                                    Invalid username
-                                </p>
-                            )}  
+            {/* Main Card */}
+            <div className="relative z-10 w-full max-w-[400px] p-6 mx-4">
+                {/* Logo Area */}
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-1 tracking-tight">
+                        Work<span className="text-lime-600">Zen</span>
+                    </h1>
+                    <p className="text-gray-500 text-sm">Simplify your workflow.</p>
+                </div>
+
+                {/* Clean White Card */}
+                <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-xl shadow-lime-900/5 p-8 relative overflow-hidden">
+
+                    <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+                        {isLogin ? 'Welcome Back' : 'Create Account'}
+                    </h2>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {/* Username (Signup Only) */}
+                        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${!isLogin ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'}`}>
+                            <div className={`relative group ${focusedField === 'username' ? 'scale-[1.01]' : ''} transition-transform duration-200`}>
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-50">
+                                    <UserOutlined
+                                        style={{
+                                            fontSize: '18px',
+                                            color: focusedField === 'username' ? '#65a30d' : '#9ca3af'
+                                        }}
+                                    />
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    onFocus={() => setFocusedField('username')}
+                                    onBlur={() => setFocusedField(null)}
+                                    className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:border-lime-500 focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+                                />
+                            </div>
                         </div>
-                    )}
 
-                    {/* Email Field */}
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm text-gray-800"
-                        >
-                            Email
-                        </label>
-                        <input
-                            type="text"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            onBlur={() => setTouched(prev => ({ ...prev, email: true }))}
-                            placeholder="Enter your email"
-                            className={`w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors placeholder:text-gray-400
-                                ${isEmailInvalid
-                                    ? 'border-red-500 focus:border-red-500'
-                                    : 'border-gray-200 focus:border-gray-400'
-                                }
-                            `}
-                        />
-                        {isEmailInvalid && (
-                            <p className="text-xs text-red-500">
-                                Invalid email address
-                            </p>
+                        {/* Email */}
+                        <div className={`relative group ${focusedField === 'email' ? 'scale-[1.01]' : ''} transition-transform duration-200`}>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-50">
+                                <MailOutlined
+                                    style={{
+                                        fontSize: '18px',
+                                        color: focusedField === 'email' ? '#65a30d' : '#9ca3af'
+                                    }}
+                                />
+                            </div>
+                            <input
+                                type="email"
+                                placeholder="Email address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onFocus={() => setFocusedField('email')}
+                                onBlur={() => setFocusedField(null)}
+                                className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:border-lime-500 focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div className={`relative group ${focusedField === 'password' ? 'scale-[1.01]' : ''} transition-transform duration-200`}>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-50">
+                                <LockOutlined
+                                    style={{
+                                        fontSize: '18px',
+                                        color: focusedField === 'password' ? '#65a30d' : '#9ca3af'
+                                    }}
+                                />
+                            </div>
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onFocus={() => setFocusedField('password')}
+                                onBlur={() => setFocusedField(null)}
+                                className="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:border-lime-500 focus:bg-white transition-all duration-200 placeholder:text-gray-400"
+                            />
+                        </div>
+
+                        {/* Forgot Password (Login Only) */}
+                        {isLogin && (
+                            <div className="flex justify-end">
+                                <a href="#" className="text-xs text-gray-500 hover:text-lime-600 transition-colors">
+                                    Forgot password?
+                                </a>
+                            </div>
                         )}
-                    </div>
 
-                    {/* Password Field */}
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm text-gray-800"
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            className="w-full flex items-center justify-center gap-2 bg-lime-500 hover:bg-lime-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.01] shadow-md shadow-lime-500/20 active:scale-[0.99] cursor-pointer"
                         >
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            onBlur={() => setTouched(prev => ({ ...prev, password: true }))}
-                            placeholder="Enter your password"
-                            className={`w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors placeholder:text-gray-400 
-                                ${isPasswordInvalid
-                                    ? 'border-red-500 focus:border-red-500'
-                                    : 'border-gray-200 focus:border-gray-400'
-                                }
-                            `}
-                        />
-                        {isPasswordInvalid && (
-                            <p className="text-xs text-red-500">
-                                Password is required
-                            </p>
-                        )}
-                    </div>
+                            <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                            <ArrowRightOutlined className="text-sm" />
+                        </button>
+                    </form>
 
-                    {/* Signup Error Message */}
-                    {!isLogin && signupError && (
-                        <p className="text-xs text-red-500">
-                            {signupError}
+
+                    {/* Footer toggle */}
+                    <div className="text-center mt-6">
+                        <p className="text-gray-500 text-sm">
+                            {isLogin ? "Don't have an account?" : "Already have an account?"}
+                            <button
+                                onClick={toggleMode}
+                                className="ml-1 text-lime-600 hover:text-lime-700 font-medium transition-colors hover:underline"
+                            >
+                                {isLogin ? 'Sign up' : 'Log in'}
+                            </button>
                         </p>
-                    )}
-
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full py-3 mt-4 text-white bg-lime-500 hover:bg-lime-600 rounded-lg transition-colors font-medium cursor-pointer"
-                    >
-                        {isLogin ? 'Login' : 'Sign Up'}
-                    </button>
-
-                    {/* Footer */}
-                    <div className="text-center text-sm text-gray-600 mt-4 cursor-pointer">
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
-                        <span
-                            onClick={toggleMode}
-                            className="text-lime-500 hover:underline cursor-pointer"
-                        >
-                            {isLogin ? 'Sign up' : 'Login'}
-                        </span>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     )
 }
 
-export default Page
+
+
