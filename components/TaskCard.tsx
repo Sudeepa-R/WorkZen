@@ -30,8 +30,8 @@ export default function TaskCard({ id, title, description, status = 'pending', d
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow flex flex-col h-full">
             <div className="flex justify-between items-start mb-3">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${displayStatus === 'completed'
-                        ? 'bg-green-100 text-green-700 border border-green-200'
-                        : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
                     }`}>
                     {displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
                 </span>

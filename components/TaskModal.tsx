@@ -84,30 +84,21 @@ export default function TaskModal({ isOpen, onClose, onSave, currentUser, initia
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="e.g. Redesign Homepage"
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500]"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] text-gray-700 placeholder-gray-400"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
-                            {isEditMode ? (
-                                <select
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] bg-white"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="completed">Completed</option>
-                                </select>
-                            ) : (
-                                <input
-                                    type="text"
-                                    value="Pending"
-                                    disabled
-                                    className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed focus:outline-none"
-                                />
-                            )}
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] bg-white text-gray-700"
+                            >
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">Owner</label>
@@ -127,7 +118,7 @@ export default function TaskModal({ isOpen, onClose, onSave, currentUser, initia
                             required
                             value={dueDate}
                             onChange={(e) => setDueDate(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500]"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] text-gray-700 placeholder-gray-400"
                         />
                     </div>
 
@@ -138,7 +129,7 @@ export default function TaskModal({ isOpen, onClose, onSave, currentUser, initia
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Add details about this task..."
-                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500]"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#5EA500] focus:ring-1 focus:ring-[#5EA500] text-gray-700 placeholder-gray-400"
                         ></textarea>
                     </div>
 
