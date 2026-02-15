@@ -1,17 +1,21 @@
 "use client";
 
-import React, { useState } from 'react';
-import { SearchOutlined, BellOutlined, UserOutlined } from '@ant-design/icons';
-import UserProfileModal from './UserProfileModal';
+import React from 'react';
+import { SearchOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const router = useRouter();
 
     // Dummy user data
     const user = {
         name: "John Doe",
         email: "john.doe@workzen.com",
         createdAt: "2023-01-15T09:00:00Z"
+    };
+
+    const handleLogout = () => {
+        router.push('/login');
     };
 
     return (
@@ -29,15 +33,15 @@ export default function Header() {
             </div>
 
             <div className="flex items-center gap-6">
-                <button className="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-50 text-gray-400 hover:text-[#5EA500] transition-colors">
-                    <BellOutlined className="text-xl" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+                <button
+                    onClick={handleLogout}
+                    className="relative w-25 h-10 flex items-center justify-center rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 text-red-500 transition-colors"
+                    title="Logout"
+                >
+                    <LogoutOutlined className="text-xl mr-2" /> Logout
                 </button>
 
-                <button
-                    onClick={() => setIsProfileOpen(true)}
-                    className="flex items-center gap-3 pl-6 border-l border-gray-100 hover:opacity-80 transition-opacity"
-                >
+                <div className="flex items-center gap-3 pl-6 border-l border-gray-100">
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-gray-800">{user.name}</p>
                         <p className="text-xs text-gray-500">Product Designer</p>
@@ -45,14 +49,8 @@ export default function Header() {
                     <div className="w-10 h-10 bg-[#5EA500] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#5EA500]/20">
                         <UserOutlined className="text-lg" />
                     </div>
-                </button>
+                </div>
             </div>
-
-            <UserProfileModal
-                isOpen={isProfileOpen}
-                onClose={() => setIsProfileOpen(false)}
-                user={user}
-            />
         </header>
     );
 }
