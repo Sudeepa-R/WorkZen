@@ -25,7 +25,6 @@ export default function TaskCard({ id, title, description, status = 'pending', d
     const handleEditClick = () => {
         onEdit({ id, title, description, status, dueDate, owner, createdAt });
     };
-
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-5 hover:shadow-md transition-shadow flex flex-col h-full">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-3">
@@ -51,7 +50,7 @@ export default function TaskCard({ id, title, description, status = 'pending', d
                     </div>
                     <div className="flex items-center gap-2" title="Owner">
                         <UserOutlined className="text-[#5EA500]" />
-                        <span>{owner}</span>
+                        <span>{typeof window !== 'undefined' && localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile') as string).name : 'Unknown User'}</span>
                     </div>
                 </div>
 

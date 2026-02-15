@@ -35,7 +35,7 @@ export default function TaskModal({ isOpen, onClose, onSave, currentUser, initia
                 setTitle(initialData.title);
                 setDescription(initialData.description);
                 setStatus(initialData.status);
-                setDueDate(initialData.dueDate);
+                setDueDate(new Date(initialData.dueDate).toISOString().split('T')[0]);
                 setOwner(initialData.owner);
             } else {
                 // Reset for Create mode
@@ -58,7 +58,7 @@ export default function TaskModal({ isOpen, onClose, onSave, currentUser, initia
             description,
             status,
             dueDate,
-            owner,
+            owner: localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile') as string).email : 'Unknown User',
             createdAt: initialData ? initialData.createdAt : new Date().toISOString()
         };
         onSave(taskData);

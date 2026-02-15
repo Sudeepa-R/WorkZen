@@ -68,10 +68,10 @@ export default function Page() {
                         secure: true,
                         sameSite: "strict"
                     });
-                    router.push('/dashboard');
                     message.success('Login successful! Redirecting to dashboard...');
                     const decoded = jwtDecode(res.token) as any;
                     await fetchUserProfile(decoded.id);
+                    router.push('/dashboard');
                 }
             } else {
                 await authApi.register({ email, password, name: username });
@@ -183,13 +183,13 @@ export default function Page() {
                         </div>
 
                         {/* Forgot Password (Login Only) */}
-                        {isLogin && (
+                        {/* {isLogin && (
                             <div className="flex justify-end">
                                 <a href="#" className="text-xs text-gray-500 hover:text-lime-600 transition-colors">
                                     Forgot password?
                                 </a>
                             </div>
-                        )}
+                        )} */}
 
                         {/* Submit Button */}
                         <button

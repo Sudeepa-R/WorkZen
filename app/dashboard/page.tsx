@@ -4,8 +4,11 @@ import React, { useState, Suspense, useEffect } from 'react';
 import TaskCard from '@/components/TaskCard';
 import TaskModal from '@/components/TaskModal';
 import { PlusOutlined } from '@ant-design/icons';
-import { Tabs, Badge, ConfigProvider, Select } from 'antd';
+import { Tabs, Badge, ConfigProvider, Select, message } from 'antd';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { tasksApi } from '@/api/tasks.api';
+
+const { getAllTasks, createTask, updateTask, deleteTask } = tasksApi;
 
 function DashboardContent() {
     const searchParams = useSearchParams();
@@ -18,47 +21,75 @@ function DashboardContent() {
 
     useEffect(() => {
         setMounted(true);
+        fetchTasks();
     }, []);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [editingTask, setEditingTask] = useState<any>(null);
+    const [tasks, setTasks] = useState<any[]>([]);
+    // const [tasks, setTasks] = useState([
+    //     {
+    //         id: 1,
+    //         title: "Redesign Homepage",
+    //         description: "Update the homepage layout to match the new branding guidelines. Focus on the hero section and navigation.",
+    //         status: "pending",
+    //         dueDate: "2023-11-15",
+    //         owner: "Alex Johnson",
+    //         createdAt: "2023-11-01T10:00:00Z"
+    //     },
+    //     {
+    //         id: 2,
+    //         title: "API Integration",
+    //         description: "Connect the frontend with the new user authentication API. Handle token storage and refresh logic.",
+    //         status: "completed",
+    //         dueDate: "2023-10-30",
+    //         owner: "Sam Smith",
+    //         createdAt: "2023-10-20T14:30:00Z"
+    //     },
+    //     {
+    //         id: 3,
+    //         title: "Q4 Marketing Plan",
+    //         description: "Draft the marketing strategy for the upcoming quarter. Include budget allocation and key performance indicators.",
+    //         status: "pending",
+    //         dueDate: "2023-12-01",
+    //         owner: "Sarah Williams",
+    //         createdAt: "2023-11-05T09:15:00Z"
+    //     }
+    // ]);
 
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            title: "Redesign Homepage",
-            description: "Update the homepage layout to match the new branding guidelines. Focus on the hero section and navigation.",
-            status: "pending",
-            dueDate: "2023-11-15",
-            owner: "Alex Johnson",
-            createdAt: "2023-11-01T10:00:00Z"
-        },
-        {
-            id: 2,
-            title: "API Integration",
-            description: "Connect the frontend with the new user authentication API. Handle token storage and refresh logic.",
-            status: "completed",
-            dueDate: "2023-10-30",
-            owner: "Sam Smith",
-            createdAt: "2023-10-20T14:30:00Z"
-        },
-        {
-            id: 3,
-            title: "Q4 Marketing Plan",
-            description: "Draft the marketing strategy for the upcoming quarter. Include budget allocation and key performance indicators.",
-            status: "pending",
-            dueDate: "2023-12-01",
-            owner: "Sarah Williams",
-            createdAt: "2023-11-05T09:15:00Z"
-        }
-    ]);
+    const fetchTasks = () => {
+        getAllTasks().then((data) => {
+            if (data && Array.isArray(data)) {
+                setTasks(data.map((task: any) => ({ ...task, id: task._id.toString() })));
+            }
+        }).catch((error) => {
+            console.error("Error fetching tasks:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to load tasks. Please try again.";
+            setTimeout(() => message.error(errorMessage), 0); // Ensure `message.error` runs in React context
+        });
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSaveTask = (taskData: any) => {
         if (editingTask) {
-            setTasks(tasks.map(t => t.id === taskData.id ? taskData : t));
+            updateTask(taskData.id, taskData).then((updatedTask) => {
+                setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+                fetchTasks();
+                message.success('Task updated successfully!');
+            }).catch((error) => {
+                console.error("Error updating task:", error);
+                const errorMessage = error.response?.data?.message || error.message || "Failed to update task. Please try again.";
+                setTimeout(() => message.error(errorMessage), 0);
+            });
         } else {
-            setTasks([taskData, ...tasks]);
+            createTask(taskData).then((createdTask) => {
+                setTasks([createdTask, ...tasks]);
+                fetchTasks();
+                message.success('Task created successfully!');
+            }).catch((error) => {
+                console.error("Error creating task:", error);
+                const errorMessage = error.response?.data?.message || error.message || "Failed to create task. Please try again.";
+                setTimeout(() => message.error(errorMessage), 0);
+            });
         }
         setEditingTask(null);
     };
@@ -70,9 +101,15 @@ function DashboardContent() {
     };
 
     const handleDeleteTask = (id: number) => {
-        if (window.confirm('Are you sure you want to delete this task?')) {
+        deleteTask(id.toString()).then(() => {
             setTasks(tasks.filter(t => t.id !== id));
-        }
+            fetchTasks();
+            message.success('Task deleted successfully!');
+        }).catch((error) => {
+            console.error("Error deleting task:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to delete task. Please try again.";
+            setTimeout(() => message.error(errorMessage), 0);
+        });
     };
 
     const handleCloseModal = () => {
@@ -268,7 +305,7 @@ function DashboardContent() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveTask}
-                currentUser="John Doe"
+                currentUser={typeof window !== 'undefined' && localStorage.getItem('userProfile') ? JSON.parse(localStorage.getItem('userProfile') as string).name : 'Unknown User'}
                 initialData={editingTask}
             />
         </div>

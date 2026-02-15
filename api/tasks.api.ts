@@ -2,8 +2,17 @@ import apiClient from './lib/apiClient';
 
 export const tasksApi = {
     getAllTasks: async (params?: any) => {
-        const response = await apiClient.get('/tasks', { params });
-        return response.data;
+        try {
+            const response = await apiClient.get('/tasks', { params });
+            return response.data;
+        } catch (error: any) {
+            console.error('Error fetching tasks:', error);
+            const errorMessage =
+                error.response?.data?.message ||
+                error.message ||
+                'An unexpected error occurred while fetching tasks.';
+            throw new Error(errorMessage);
+        }
     },
     getTaskById: async (id: string) => {
         const response = await apiClient.get(`/tasks/${id}`);
