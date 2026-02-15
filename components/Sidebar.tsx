@@ -19,7 +19,7 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="w-72 bg-[#f8fff8] border-r border-[#e6f4e6] h-full p-8 hidden lg:block shadow-[inset_-1px_0_0_rgba(0,0,0,0.02)]">
+        <aside className="hidden lg:block w-72 bg-[#f8fff8] border-r border-[#e6f4e6] h-full p-8 shadow-[inset_-1px_0_0_rgba(0,0,0,0.02)]">
             <div className="flex items-center gap-2 mb-10">
                 <FilterOutlined className="text-[#5EA500] text-lg" />
                 <h2 className="text-xl font-bold text-gray-800 tracking-tight">Filters</h2>

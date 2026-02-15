@@ -27,8 +27,8 @@ export default function TaskCard({ id, title, description, status = 'pending', d
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow flex flex-col h-full">
-            <div className="flex justify-between items-start mb-3">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-5 hover:shadow-md transition-shadow flex flex-col h-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-3">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${displayStatus === 'completed'
                     ? 'bg-green-100 text-green-700 border border-green-200'
                     : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
@@ -40,8 +40,8 @@ export default function TaskCard({ id, title, description, status = 'pending', d
                 </span>
             </div>
 
-            <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-1" title={title}>{title}</h3>
-            <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">{description}</p>
+            <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2 line-clamp-1" title={title}>{title}</h3>
+            <p className="text-gray-500 text-xs md:text-sm mb-4 line-clamp-2 flex-grow">{description}</p>
 
             <div className="border-t border-gray-50 pt-4 mt-auto space-y-3">
                 <div className="flex items-center justify-between text-sm text-gray-600">
@@ -58,13 +58,13 @@ export default function TaskCard({ id, title, description, status = 'pending', d
                 <div className="flex gap-2 pt-2">
                     <button
                         onClick={handleEditClick}
-                        className="flex-1 py-1.5 bg-[#5EA500] text-white text-xs font-medium rounded-md hover:bg-[#4a8000] transition-colors"
+                        className="flex-1 py-1.5 bg-[#5EA500] text-white text-xs font-medium rounded-md hover:bg-[#4a8000] transition-colors cursor-pointer"
                     >
                         Edit
                     </button>
                     <button
                         onClick={() => onDelete(id)}
-                        className="flex-1 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors"
+                        className="flex-1 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                         Delete
                     </button>
