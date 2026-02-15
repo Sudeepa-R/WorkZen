@@ -4,7 +4,8 @@ import {
     UserOutlined,
     LockOutlined,
     MailOutlined,
-    ArrowRightOutlined
+    ArrowRightOutlined,
+    LoadingOutlined
 } from '@ant-design/icons'
 
 import { useRouter } from 'next/navigation';
@@ -19,6 +20,7 @@ const cookies = new Cookies();
 export default function Page() {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
+    const [loading, setLoading] = useState(false);
     // Dummy credentials pre-filled
     const [email, setEmail] = useState('demo@workzen.com');
     const [password, setPassword] = useState('password123');
@@ -52,30 +54,36 @@ export default function Page() {
     }
 
     // Redirect to dashboard on login submission
-    const handleSubmit = (e: React.FormEvent) => {
-        if (isLogin) {
-            authApi.login({ email, password })
-                .then(async (res) => {
-                    if (res.token) {
-                        cookies.set("token", res.token, {
-                            path: "/",
-                            maxAge: 7 * 24 * 60 * 60,
-                            secure: true,
-                            sameSite: "strict"
-                        });
-                        router.push('/dashboard');
-                        message.success('Login successful! Redirecting to dashboard...');
-                        const decoded = jwtDecode(res.token) as any;
-                        fetchUserProfile(decoded.id);
-                    }
-
-                })
-                .catch((err) => {
-                    message.error(err?.message ?? 'error while login');
-                    console.log("Login failed", err);
-                });
-        }
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
+
+        try {
+            if (isLogin) {
+                const res = await authApi.login({ email, password });
+                if (res.token) {
+                    cookies.set("token", res.token, {
+                        path: "/",
+                        maxAge: 7 * 24 * 60 * 60,
+                        secure: true,
+                        sameSite: "strict"
+                    });
+                    router.push('/dashboard');
+                    message.success('Login successful! Redirecting to dashboard...');
+                    const decoded = jwtDecode(res.token) as any;
+                    await fetchUserProfile(decoded.id);
+                }
+            } else {
+                await authApi.register({ email, password, name: username });
+                message.success('Registration successful! Please log in.');
+                setIsLogin(true);
+            }
+        } catch (err) {
+            const errorMsg = err?.response?.data?.message || err?.message || 'An error occurred';
+            message.error(errorMsg);
+        } finally {
+            setLoading(false);
+        }
         console.log("Submitted", { isLogin, email, password, username });
         // if (isLogin) {
         //     router.push('/dashboard');
@@ -186,10 +194,20 @@ export default function Page() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full flex items-center justify-center gap-2 bg-lime-500 hover:bg-lime-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.01] shadow-md shadow-lime-500/20 active:scale-[0.99] cursor-pointer"
+                            className={`w-full flex items-center justify-center gap-2 bg-lime-500 hover:bg-lime-600 text-white font-medium py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.01] shadow-md shadow-lime-500/20 active:scale-[0.99] cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            disabled={loading}
                         >
-                            <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
-                            <ArrowRightOutlined className="text-sm" />
+                            {loading ? (
+                                <>
+                                    <LoadingOutlined className="animate-spin text-white" />
+                                    <span>Loading...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+                                    <ArrowRightOutlined className="text-sm" />
+                                </>
+                            )}
                         </button>
                     </form>
 

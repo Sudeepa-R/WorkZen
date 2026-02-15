@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SearchOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import Cookies from "universal-cookie";
@@ -9,13 +9,27 @@ const cookies = new Cookies();
 
 export default function Header() {
     const router = useRouter();
+    const [user, setUser] = React.useState({
+        name: "",
+        email: ""
+    });
 
-    // Dummy user data
-    const user = {
-        name: "John Doe",
-        email: "john.doe@workzen.com",
-        createdAt: "2023-01-15T09:00:00Z"
-    };
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    const fetchUserData = () => {
+        if (typeof window !== "undefined") {
+            const storedProfile = localStorage.getItem("userProfile");
+            if (storedProfile) {
+                const data = JSON.parse(storedProfile);
+                setUser({
+                    name: data.name,
+                    email: data.email
+                });
+            }
+        }
+    }
 
     const handleLogout = () => {
         localStorage.clear();
@@ -54,7 +68,7 @@ export default function Header() {
                 <div className="flex items-center gap-2 md:gap-3 pl-2 md:pl-4 lg:pl-6 border-l border-gray-100">
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-gray-800">{user.name}</p>
-                        <p className="text-xs text-gray-500">Product Designer</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                     <div className="w-8 h-8 md:w-10 md:h-10 bg-[#5EA500] rounded-xl flex items-center justify-center text-white shadow-lg shadow-[#5EA500]/20 cursor-pointer">
                         <UserOutlined className="text-sm md:text-lg" />
