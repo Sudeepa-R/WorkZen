@@ -58,12 +58,14 @@ export default function TaskCard({ id, title, description, status = 'pending', d
                 <div className="flex gap-2 pt-2">
                     <button
                         onClick={handleEditClick}
+                        suppressHydrationWarning
                         className="flex-1 py-1.5 bg-[#5EA500] text-white text-xs font-medium rounded-md hover:bg-[#4a8000] transition-colors cursor-pointer"
                     >
                         Edit
                     </button>
                     <button
                         onClick={() => onDelete(id)}
+                        suppressHydrationWarning
                         className="flex-1 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-md hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                         Delete

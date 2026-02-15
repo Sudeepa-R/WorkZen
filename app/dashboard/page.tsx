@@ -123,6 +123,7 @@ function DashboardContent() {
                             setEditingTask(null);
                             setIsModalOpen(true);
                         }}
+                        suppressHydrationWarning
                         className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-[#5EA500] text-white text-sm font-medium rounded-lg hover:bg-[#4a8000] transition-colors shadow-sm cursor-pointer"
                     >
                         <PlusOutlined />
