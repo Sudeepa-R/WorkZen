@@ -59,13 +59,6 @@ export default function Sidebar() {
                     </div>
                 </div>
             </div>
-
-            {/* Optional: Add a decorative element or bottom section if needed */}
-            <div className="mt-auto pt-10 border-t border-[#e6f4e6]/50 mt-10">
-                <div className="p-4 bg-white/50 rounded-xl border border-[#e6f4e6]">
-                    <p className="text-xs text-[#4a8000] font-medium text-center">Pro Tip: Use filters to focus on what matters.</p>
-                </div>
-            </div>
         </aside>
     );
 }
