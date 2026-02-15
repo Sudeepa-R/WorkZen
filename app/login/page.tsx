@@ -9,6 +9,13 @@ import {
 
 import { useRouter } from 'next/navigation';
 
+import { authApi } from '@/api/auth.api';
+import Cookies from "universal-cookie";
+import { message, notification } from 'antd';
+import { jwtDecode } from "jwt-decode";
+
+const cookies = new Cookies();
+
 export default function Page() {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
@@ -33,13 +40,46 @@ export default function Page() {
         setUsername('');
     }
 
+    const fetchUserProfile = async (userId: string) => {
+        authApi.getProfile(userId)
+            .then((profile) => {
+                localStorage.setItem("userProfile", JSON.stringify(profile));
+            })
+            .catch((err) => {
+                message.error('Failed to fetch user profile');
+                console.error("Failed to fetch user profile", err);
+            });
+    }
+
     // Redirect to dashboard on login submission
     const handleSubmit = (e: React.FormEvent) => {
+        if (isLogin) {
+            authApi.login({ email, password })
+                .then(async (res) => {
+                    if (res.token) {
+                        cookies.set("token", res.token, {
+                            path: "/",
+                            maxAge: 7 * 24 * 60 * 60,
+                            secure: true,
+                            sameSite: "strict"
+                        });
+                        router.push('/dashboard');
+                        message.success('Login successful! Redirecting to dashboard...');
+                        const decoded = jwtDecode(res.token) as any;
+                        fetchUserProfile(decoded.id);
+                    }
+
+                })
+                .catch((err) => {
+                    message.error(err?.message ?? 'error while login');
+                    console.log("Login failed", err);
+                });
+        }
         e.preventDefault();
         console.log("Submitted", { isLogin, email, password, username });
-        if (isLogin) {
-            router.push('/dashboard');
-        }
+        // if (isLogin) {
+        //     router.push('/dashboard');
+        // }
     };
 
 

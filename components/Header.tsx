@@ -3,6 +3,9 @@
 import React from 'react';
 import { SearchOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 export default function Header() {
     const router = useRouter();
@@ -15,6 +18,8 @@ export default function Header() {
     };
 
     const handleLogout = () => {
+        localStorage.clear();
+        cookies.remove("token", { path: "/" });
         router.push('/login');
     };
 

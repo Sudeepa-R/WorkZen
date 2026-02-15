@@ -3,7 +3,7 @@
 import React, { useState, Suspense, useEffect } from 'react';
 import TaskCard from '@/components/TaskCard';
 import TaskModal from '@/components/TaskModal';
-import { PlusOutlined, DownOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { Tabs, Badge, ConfigProvider, Select } from 'antd';
 import { useSearchParams, useRouter } from 'next/navigation';
 
