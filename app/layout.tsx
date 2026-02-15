@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WorkZen",
+  title: "Mini Task Tracker",
   description: "A modern task management application.",
 };
 

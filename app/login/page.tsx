@@ -17,7 +17,7 @@ import { jwtDecode } from "jwt-decode";
 
 const cookies = new Cookies();
 
-export default function Page() {
+export default function LoginPage() {
     const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ export default function Page() {
                 message.success('Registration successful! Please log in.');
                 setIsLogin(true);
             }
-        } catch (err) {
+        } catch (err: any) {
             const errorMsg = err?.response?.data?.message || err?.message || 'An error occurred';
             message.error(errorMsg);
         } finally {
@@ -104,7 +104,7 @@ export default function Page() {
                 {/* Logo Area */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800 mb-1 tracking-tight">
-                        Work<span className="text-lime-600">Zen</span>
+                        Mini Task Tracker
                     </h1>
                     <p className="text-gray-500 text-sm">Simplify your workflow.</p>
                 </div>

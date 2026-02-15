@@ -1,9 +1,9 @@
-# WorkZen
+# Mini Task Tracker
 
-WorkZen is a modern task management application designed to help individuals and teams organize their work efficiently. Built with [Next.js](https://nextjs.org), it leverages the latest web technologies to deliver a seamless user experience.
+Mini Task Tracker is a modern task management application designed to help individuals and teams organize their work efficiently. Built with [Next.js](https://nextjs.org), it leverages the latest web technologies to deliver a seamless user experience.
 
 ## Purpose
-The goal of WorkZen is to simplify task management by providing an intuitive interface and robust features. Whether you're managing personal to-dos or collaborating on team projects, WorkZen is designed to keep you productive and focused.
+The goal of Mini Task Tracker is to simplify task management by providing an intuitive interface and robust features. Whether you're managing personal to-dos or collaborating on team projects, Mini Task Tracker is designed to keep you productive and focused.
 
 ## Features
 - **User Authentication**: Secure login and session management to protect user data.
@@ -25,12 +25,12 @@ Follow these steps to set up the project locally:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/workzen.git
+   git clone https://github.com/your-repo/mini-task-tracker.git
    ```
 
 2. Navigate to the project directory:
    ```bash
-   cd workzen
+   cd mini-task-tracker
    ```
 
 3. Install dependencies:
@@ -56,7 +56,7 @@ Follow these steps to set up the project locally:
 - **`public/`**: Static assets like images and fonts.
 
 ## Deployment
-The easiest way to deploy WorkZen is via [Vercel](https://vercel.com), the creators of Next.js. Follow these steps:
+The easiest way to deploy Mini Task Tracker is via [Vercel](https://vercel.com), the creators of Next.js. Follow these steps:
 
 1. Push your code to a Git repository (e.g., GitHub).
 2. Connect your repository to Vercel.
@@ -72,7 +72,7 @@ To dive deeper into the technologies used in this project, check out the followi
 - [Vercel Platform](https://vercel.com): Deploy your Next.js applications with ease.
 
 ## Contributing
-We welcome contributions to WorkZen! If you'd like to contribute, please follow these steps:
+We welcome contributions to Mini Task Tracker! If you'd like to contribute, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bug fix.
