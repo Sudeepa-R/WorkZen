@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import TaskCard from '@/components/TaskCard';
 import TaskModal from '@/components/TaskModal';
 import { PlusOutlined, DownOutlined } from '@ant-design/icons';
+import { Tabs, Badge, ConfigProvider, Select } from 'antd';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function DashboardContent() {
@@ -12,7 +13,13 @@ function DashboardContent() {
     const statusFilter = searchParams.get('status');
     const dateFilter = searchParams.get('dueDate');
 
+    const [mounted, setMounted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [editingTask, setEditingTask] = useState<any>(null);
 
@@ -115,58 +122,124 @@ function DashboardContent() {
         <div className="flex flex-col h-full">
             {/* Fixed Header Section with Create Task and Filters */}
             <div className="flex-shrink-0 bg-white pb-4 md:pb-6">
-                {/* Title and Create Button */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4">
-                    <h1 className="text-xl md:text-2xl font-bold text-gray-800">Task List</h1>
+                {/* Title and Create Button - More compact on mobile */}
+                <div className="flex flex-row items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Tasks</h1>
+                    </div>
                     <button
                         onClick={() => {
                             setEditingTask(null);
                             setIsModalOpen(true);
                         }}
                         suppressHydrationWarning
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-[#5EA500] text-white text-sm font-medium rounded-lg hover:bg-[#4a8000] transition-colors shadow-sm cursor-pointer"
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-[#5EA500] text-white text-sm font-medium rounded-lg hover:bg-[#4a8000] transition-colors shadow-sm cursor-pointer"
                     >
                         <PlusOutlined />
-                        <span>Create Task</span>
+                        <span className="hidden sm:inline">Create Task</span>
+                        <span className="inline sm:hidden">New</span>
                     </button>
                 </div>
 
-                {/* Inline Filters - Mobile/Tablet Only */}
-                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Status Filter */}
-                    <div className="group">
-                        <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wider">Status</label>
-                        <div className="relative">
-                            <select
-                                onChange={(e) => handleFilterChange('status', e.target.value)}
-                                value={statusFilter || 'all'}
-                                className="w-full appearance-none bg-white border border-[#e6f4e6] text-gray-700 py-2.5 px-3 rounded-lg shadow-sm focus:outline-none focus:border-[#5EA500] focus:ring-2 focus:ring-[#5EA500]/20 transition-all cursor-pointer hover:border-[#5EA500]/50 text-sm"
-                            >
-                                <option value="all">All Statuses</option>
-                                <option value="pending">Pending</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                            <DownOutlined className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#5EA500] pointer-events-none" />
-                        </div>
-                    </div>
+                {/* Tabs Filter - Status (Visible on all devices) */}
+                <div className="mt-2 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-gray-100 overflow-x-auto no-scrollbar">
+                    {mounted && (
+                        <ConfigProvider
+                            theme={{
+                                token: {
+                                    colorPrimary: '#5EA500',
+                                    borderRadius: 8,
+                                },
+                                components: {
+                                    Tabs: {
+                                        titleFontSize: 14,
+                                        itemSelectedColor: '#5EA500',
+                                        itemHoverColor: '#5EA500',
+                                        inkBarColor: '#5EA500',
+                                    }
+                                }
+                            }}
+                        >
+                            <Tabs
+                                activeKey={statusFilter || 'all'}
+                                onChange={(key) => handleFilterChange('status', key)}
+                                className="status-tabs"
+                                items={[
+                                    {
+                                        key: 'all',
+                                        label: (
+                                            <div className="flex items-center gap-2 pb-1">
+                                                <span>All Tasks</span>
+                                                <Badge
+                                                    count={tasks.length}
+                                                    showZero
+                                                    color={(!statusFilter || statusFilter === 'all') ? '#5EA500' : '#d9d9d9'}
+                                                    className="scale-90"
+                                                />
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        key: 'pending',
+                                        label: (
+                                            <div className="flex items-center gap-2 pb-1">
+                                                <span>Pending</span>
+                                                <Badge
+                                                    count={tasks.filter(t => t.status === 'pending').length}
+                                                    showZero
+                                                    color={statusFilter === 'pending' ? '#5EA500' : '#d9d9d9'}
+                                                    className="scale-90"
+                                                />
+                                            </div>
+                                        ),
+                                    },
+                                    {
+                                        key: 'completed',
+                                        label: (
+                                            <div className="flex items-center gap-2 pb-1">
+                                                <span>Completed</span>
+                                                <Badge
+                                                    count={tasks.filter(t => t.status === 'completed').length}
+                                                    showZero
+                                                    color={statusFilter === 'completed' ? '#5EA500' : '#d9d9d9'}
+                                                    className="scale-90"
+                                                />
+                                            </div>
+                                        ),
+                                    },
+                                ]}
+                            />
+                        </ConfigProvider>
+                    )}
+                </div>
 
-                    {/* Due Date Filter */}
-                    <div className="group">
-                        <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wider">Due Date</label>
-                        <div className="relative">
-                            <select
-                                onChange={(e) => handleFilterChange('dueDate', e.target.value)}
-                                value={dateFilter || 'all'}
-                                className="w-full appearance-none bg-white border border-[#e6f4e6] text-gray-700 py-2.5 px-3 rounded-lg shadow-sm focus:outline-none focus:border-[#5EA500] focus:ring-2 focus:ring-[#5EA500]/20 transition-all cursor-pointer hover:border-[#5EA500]/50 text-sm"
-                            >
-                                <option value="all">Any Date</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="overdue">Overdue</option>
-                            </select>
-                            <DownOutlined className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#5EA500] pointer-events-none" />
-                        </div>
-                    </div>
+                {/* Inline Filters - Mobile/Tablet Only (Due Date) */}
+                <div className="lg:hidden mb-6">
+                    {mounted && (
+                        <ConfigProvider
+                            theme={{
+                                token: {
+                                    colorPrimary: '#5EA500',
+                                },
+                            }}
+                        >
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Due Date</label>
+                                <Select
+                                    size="large"
+                                    className="w-full"
+                                    onChange={(value) => handleFilterChange('dueDate', value)}
+                                    value={dateFilter || 'all'}
+                                    options={[
+                                        { value: 'all', label: 'Any Date' },
+                                        { value: 'today', label: 'Today' },
+                                        { value: 'week', label: 'This Week' },
+                                        { value: 'overdue', label: 'Overdue' },
+                                    ]}
+                                />
+                            </div>
+                        </ConfigProvider>
+                    )}
                 </div>
             </div>
 
