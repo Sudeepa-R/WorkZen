@@ -3,19 +3,23 @@
 import React from 'react';
 import { PlusOutlined, DownOutlined, FilterOutlined } from '@ant-design/icons';
 import { Tabs, Badge, ConfigProvider, Select } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [mounted, setMounted] = useState(false);
+    const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
 
     useEffect(() => {
         setMounted(true);
+        if (typeof window !== 'undefined') {
+            setSearchParams(new URLSearchParams(window.location.search));
+        }
     }, []);
 
     const handleFilterChange = (key: string, value: string) => {
+        if (!searchParams) return;
         const params = new URLSearchParams(searchParams.toString());
         if (value && value !== 'all') {
             params.set(key, value);
@@ -36,7 +40,7 @@ export default function Sidebar() {
                 {mounted && (
                     <>
                         <div className="group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider text-xs">Status</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider">Status</label>
                             <ConfigProvider
                                 theme={{
                                     token: {
@@ -48,7 +52,7 @@ export default function Sidebar() {
                                     className="w-full"
                                     style={{ height: '48px' }}
                                     onChange={(value) => handleFilterChange('status', value)}
-                                    value={searchParams.get('status') || 'all'}
+                                    value={searchParams?.get('status') || 'all'}
                                     options={[
                                         { value: 'all', label: 'All Statuses' },
                                         { value: 'pending', label: 'Pending' },
@@ -59,7 +63,7 @@ export default function Sidebar() {
                         </div>
 
                         <div className="group">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider text-xs">Due Date</label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2.5 uppercase tracking-wider">Due Date</label>
                             <ConfigProvider
                                 theme={{
                                     token: {
@@ -71,7 +75,7 @@ export default function Sidebar() {
                                     className="w-full"
                                     style={{ height: '48px' }}
                                     onChange={(value) => handleFilterChange('dueDate', value)}
-                                    value={searchParams.get('dueDate') || 'all'}
+                                    value={searchParams?.get('dueDate') || 'all'}
                                     options={[
                                         { value: 'all', label: 'Any Date' },
                                         { value: 'today', label: 'Today' },

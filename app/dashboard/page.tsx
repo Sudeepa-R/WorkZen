@@ -5,17 +5,34 @@ import TaskCard from '@/components/TaskCard';
 import TaskModal from '@/components/TaskModal';
 import { PlusOutlined } from '@ant-design/icons';
 import { Tabs, Badge, ConfigProvider, Select, message } from 'antd';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { tasksApi } from '@/api/tasks.api';
 
 const { getAllTasks, createTask, updateTask, deleteTask } = tasksApi;
 
 function DashboardContent() {
-    const searchParams = useSearchParams();
     const router = useRouter();
-    const statusFilter = searchParams.get('status');
-    const dateFilter = searchParams.get('dueDate');
+    const [statusFilter, setStatusFilter] = useState<string | null>(null);
+    const [dateFilter, setDateFilter] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            setStatusFilter(params.get('status'));
+            setDateFilter(params.get('dueDate'));
+        }
+    }, []);
+
+    return (
+        <InnerDashboardContent
+            statusFilter={statusFilter}
+            dateFilter={dateFilter}
+            router={router}
+        />
+    );
+}
+
+function InnerDashboardContent({ statusFilter, dateFilter, router }: { statusFilter: string | null; dateFilter: string | null; router: ReturnType<typeof useRouter> }) {
     const [mounted, setMounted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -118,7 +135,7 @@ function DashboardContent() {
     };
 
     const handleFilterChange = (key: string, value: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(window.location.search);
         if (value && value !== 'all') {
             params.set(key, value);
         } else {
